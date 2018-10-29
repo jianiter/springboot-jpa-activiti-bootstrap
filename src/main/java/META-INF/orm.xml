@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_0.xsd"
+                 version="2.1">
+
+    <named-native-query name="User.findByIdAndPwd"
+                        result-class="com.dd.activiti.admin.model.User">
+        <query>
+            <![CDATA[
+            select * from ACT_ID_USER as u
+            where u.ID_=:id and u.PWD_=:pwd
+            ]]>
+        </query>
+    </named-native-query>
+
+    <named-native-query name="MemberShip.findByUserId"
+                        result-class="com.dd.activiti.admin.model.MemberShip">
+        <query>
+            <![CDATA[
+            select * from ACT_ID_MEMBERSHIP as u where u.USER_ID_=:userId
+            ]]>
+        </query>
+    </named-native-query>
+
+
+</entity-mappings>
+

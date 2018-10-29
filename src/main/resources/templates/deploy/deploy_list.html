@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:score="http://thymeleafexamples">
+<html lang="en">
+<!--<head th:replace="~{${@environment.getProperty('server.contextPath') + '/common/header'} :: html}" />-->
+<head>
+<title>后台首页</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" th:href="@{../css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{../css/default.css}">
+<script th:src="@{../js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{../js/popper.min.js}"></script>
+<script th:src="@{../js/bootstrap.min.js}"></script>
+<script th:src="@{../js/bootstrap-paginator.js}"></script>
+<script th:src="@{../js/paginator.js}"></script>
+<script th:src="@{../js/bootstrapValidator.min.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        function searchList(page){
+            $("#tableList").empty();
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/deploy/list/page/"+page+"/size/10";
+
+            $.get(url,function(result){
+                var data=eval('('+result+')');
+                if(data.size>0){
+                   // 加载列表
+                    $.each(data.content, function(i, item) {
+                        var tr = $("#tableRowModel tr").eq(0).clone();
+                        $(tr).find('.id').html(item.id);
+                        $(tr).find('.name').html(item.name);
+                        $(tr).find('.deploymentTime').html(item.deploymentTime);
+                        $(tr).find('.btnDel').attr("href","javascript:del('"+item.id+"')");
+                        $(tr).removeAttr("style");
+                        tr.appendTo("#tableList");
+
+                    });
+                    // 分页
+                    initPageData(page,data.totalPages);
+                }
+            });
+        }
+
+
+        $(document).ready(function(){
+            searchList(1);
+        });
+
+        function openDeployAddDiglog() {
+            $("#deployModal").modal("show");
+
+        }
+
+        function closeDeployDialog(){
+            $("#deployModal").modal("hide");
+        }
+
+        function saveDeploy(){
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/deploy/save";
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                cache: false,
+                data: new FormData($('#deployForm')[0]),
+                dataType: "json",
+                processData: false,
+                contentType: false
+            }).done(function(data) {
+                if(data.code=="success"){
+                    alert("部署成功");
+                    $("#deployModal").modal("hide");
+                    return false;
+                }else{
+                    alert(data.errMsg);
+                }
+            }).fail(function(res) {
+                alert(res);
+            });
+
+        }
+
+        function del(id) {
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/deploy/delete/id/"+id;
+            $.ajax({
+                type: "DELETE",
+                url: url,
+                data:JSON.stringify({
+                    id: $("#id").val()
+                }),
+                // async:false, //不是异步处理
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                processData:false,
+                success:function(data){
+                    if(data.code=="success"){
+                        alert("删除成功");
+
+                        return false;
+                    }else{
+                        alert(data.errMsg);
+                    }
+                },
+                error:function(result){
+                    alert(result.responseJSON.msg);
+                }
+            });
+            return false;
+
+        }
+
+
+    </script>
+</head>
+<body>
+<div class="container-fluid _body">
+
+    <div th:include="common/nav :: html"></div>
+    <div class="row _content">
+        <div class="col-md-3 _menu">
+            <div th:include="common/menu :: html"></div>
+        </div>
+        <div class="col-md-9 _main">
+
+            <div class="_main_title">
+                <h3>流程部署管理</h3>
+            </div>
+            <div>
+                <button type="button" class="btn btn-default" onclick="openDeployAddDiglog()" data-dismiss="modal" >添加</button>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>名称</th>
+                    <th>部署时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="tableList">
+
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="pageButton"></ul>
+            </nav>
+
+            <table>
+                <tbody id="tableRowModel" style="display: none">
+                    <!-- 列表的行模板 -->
+                    <tr >
+                        <td class="id">编号</td>
+                        <td class="name">名称</td>
+                        <td class="deploymentTime">部署时间</td>
+                        <td>
+                            <a class="btnDel" href="javascript:del('')">删除</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Modal -->
+            <div class="modal fade" id="deployModal" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">流程部署信息</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deployForm" class="form-horizontal" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">文件</label>
+                                    <div class="col-sm-10">
+                                        <input type="file" name="deployFile" class="form-control" required="true"/>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" onclick="closeDeployDialog()" data-dismiss="modal"  id="resetBtn">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="saveDeploy()" data-toggle="modal" data-target="#myModal">确认</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+</div>
+    </div>
+</div>
+</body>
+</html>
+

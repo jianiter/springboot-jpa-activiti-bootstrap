@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:score="http://thymeleafexamples">
+<html lang="en">
+<head>
+    <title>后台首页</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/default.css}">
+    <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script th:src="@{/js/popper.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</head>
+<body>
+    <div class="container-fluid _body">
+
+        <div th:include="common/nav :: html"></div>
+        <div class="row _content">
+            <div class="col-md-3 _menu">
+                <div th:include="common/menu :: html"></div>
+            </div>
+            <div class="col-md-9 _main">
+                <div id="divContent">开始吧</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

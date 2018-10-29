@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:score="http://thymeleafexamples">
+<script type="text/javascript" th:inline="javascript">
+
+    function jumpTo(url) {
+       var contextPath = $('#contextPath').attr('href');
+       window.location.href=contextPath+url;
+    }
+</script>
+<div th:switch="${session.User_Session_Group}">
+    <div th:case="gly">
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading panel-primary _menu_title">系统管理</div>
+    <div class="panel-body">
+    </div>
+    <!-- List group -->
+    <ul class="list-group _menu_item">
+        <li class="list-group-item">菜单管理</li>
+        <li class="list-group-item"><a href="javascript:jumpTo('group/group_list')">角色管理</a></li>
+        <li class="list-group-item"><a href="javascript:jumpTo('user/user_list')">用户管理</a></li>
+        <li class="list-group-item"><a href="javascript:jumpTo('user/reset_pwd')">修改密码</a></li>
+    </ul>
+</div>
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading panel-primary _menu_title">基础管理</div>
+    <div class="panel-body">
+    </div>
+    <!-- List group -->
+    <ul class="list-group _menu_item">
+        <li class="list-group-item"><a href="javascript:jumpTo('deploy/deploy_list')">流程部署管理</a></li>
+        <li class="list-group-item"><a href="javascript:jumpTo('deploy/processdefinition_list')">流程定义管理</a></li>
+
+    </ul>
+</div>
+    </div>
+
+    <div th:case="*">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading panel-primary _menu_title">系统管理</div>
+            <div class="panel-body">
+            </div>
+            <!-- List group -->
+            <ul class="list-group _menu_item">
+                <li class="list-group-item"><a href="javascript:jumpTo('user/reset_pwd')">修改密码</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading panel-primary _menu_title">业务管理</div>
+    <div class="panel-body">
+    </div>
+    <!-- List group -->
+    <ul class="list-group _menu_item">
+        <li class="list-group-item"><a href="javascript:jumpTo('user/add_user')">添加用户申请</a></li>
+        <li class="list-group-item"><a href="javascript:jumpTo('group/add_group')">添加角色申请</a></li>
+    </ul>
+</div>
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading panel-primary _menu_title">任务管理</div>
+    <div class="panel-body">
+    </div>
+    <!-- List group -->
+    <ul class="list-group _menu_item">
+        <li class="list-group-item"><a href="javascript:jumpTo('task/task_todo_list')">待办任务管理</a></li>
+        <li class="list-group-item"><a href="javascript:jumpTo('task/task_finish_list')">已办任务管理</a></li>
+    </ul>
+</div>
+<div th:include="common/footer :: html"></div>
+</html>

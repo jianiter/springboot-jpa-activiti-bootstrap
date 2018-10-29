@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:score="http://thymeleafexamples">
+<html lang="en">
+<!--<head th:replace="~{${@environment.getProperty('server.contextPath') + '/common/header'} :: html}" />-->
+<head>
+<title>后台首页</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" th:href="@{../css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{../css/default.css}">
+<script th:src="@{../js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{../js/popper.min.js}"></script>
+<script th:src="@{../js/bootstrap.min.js}"></script>
+<script th:src="@{../js/bootstrap-paginator.js}"></script>
+<script th:src="@{../js/paginator.js}"></script>
+<script th:src="@{../js/bootstrapValidator.min.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+        function searchList(page){
+            $("#tableList").empty();
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/task/todo/list/page/"+page+"/size/10";
+
+            $.getJSON(url,function(data){
+                console.log(data);
+                if(data.size>0){
+                   // 加载列表
+                    $.each(data.content, function(i, item) {
+                        var tr = $("#tableRowModel tr").eq(0).clone();
+                        $(tr).find('.id').html(item.id);
+                        $(tr).find('.name').html(item.name);
+                        $(tr).find('.createTime').html(item.createTime);
+                        $(tr).find('.btnSave').attr("href","javascript:openFinishTaskTab('"+item.id+"')");
+                        $(tr).find('.btnShow').attr("href",contextPath+"process_history_view/id/"+item.id);
+                        $(tr).removeAttr("style");
+                        tr.appendTo("#tableList");
+
+                    });
+                    // 分页
+                    initPageData(page,data.totalPages);
+                }
+            });
+        }
+
+        function openFinishTaskTab(taskId){
+            var contextPath = $('#contextPath').attr('href');
+            var url = contextPath+"api/task/todo/redirect/id/"+taskId;
+            $.ajax({
+                type: "GET",
+                url: url,
+                async:false, //不是异步处理
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                processData:false,
+                success:function(data){
+                    if(data.code=="success"){
+                        window.location.href =contextPath+ data.content+"/task_id/"+taskId;
+                        return false;
+                    }else{
+                        alert(data.errMsg);
+                    }
+                },
+                error:function(result){
+                    alert(result.responseJSON.msg);
+                }
+            });
+            return false;
+        }
+
+
+        $(document).ready(function(){
+            searchList(1);
+            // 重置表单验证
+            $('#resetBtn').click(function() {
+                $('#userForm').data('bootstrapValidator').resetForm(true);
+            });
+        });
+
+        function showForm(rowIndex) {
+            $("#userModal").modal("show");
+            var tr = $("#tableList").find("tr").eq(rowIndex);
+            $("#id").val($(tr).find('.id').text());
+            $("#first").val($(tr).find('.name').text());
+            $("#last").val($(tr).find('.name').text());
+            $("#email").val($(tr).find('.email').text());
+
+        }
+
+
+        function  check() {
+            // 验证表单的规则
+            $('#userForm').bootstrapValidator({
+                live: 'enabled',
+                message: '输入的值无效',
+                submitButtons: 'button[type="submit"]',
+                submitHandler: save(),
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    first: {
+                        validators: {
+                            notEmpty: {
+                                message: '请输入姓'
+                            },
+                            stringLength: {
+                                min: 1,
+                                max: 10,
+                                message: '姓长度不能小于1位或超过10位'
+                            }
+                        }
+                    },
+                    last: {
+                        validators: {
+                            notEmpty: {
+                                message: '请输入名'
+                            },
+                            stringLength: {
+                                min: 1,
+                                max: 10,
+                                message: '名长度不能小于1位或超过10位'
+                            }
+                        }
+                    },
+                    email: {
+                        validators: {
+                            notEmpty: {
+                                message: '请输入Email'
+                            },
+                            emailAddress:{
+                                message: '请输入正确格式的Email'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function save() {
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/users/save";
+            // var param = $("#userForm").serialize();
+            $.ajax({
+                type: "POST",
+                url: url,
+                data:JSON.stringify({
+                    id: $("#id").val(),
+                    first:$("#first").val(),
+                    last:$("#last").val(),
+                    email:$("#email").val()
+                }),
+                async:false, //不是异步处理
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                processData:false,
+                success:function(data){
+                    if(data.code=="success"){
+                        alert("保存成功");
+                        $("#userModal").modal("hide");
+                        return false;
+                    }else{
+                        alert(data.errMsg);
+                    }
+                },
+                error:function(result){
+                    alert(result.responseJSON.msg);
+                }
+            });
+            return false;
+
+        }
+
+    </script>
+</head>
+<body>
+<div class="container-fluid _body">
+
+    <div th:include="common/nav :: html"></div>
+    <div class="row _content">
+        <div class="col-md-3 _menu">
+            <div th:include="common/menu :: html"></div>
+        </div>
+        <div class="col-md-9 _main">
+
+            <div class="_main_title">
+                <h3>待办任务管理</h3>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>名称</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="tableList">
+
+                </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="pageButton"></ul>
+            </nav>
+
+            <table>
+                <tbody id="tableRowModel" style="display: none">
+                    <!-- 列表的行模板 -->
+                    <tr >
+                        <td class="id">编号</td>
+                        <td class="name">名称</td>
+                        <td class="createTime">创建时间</td>
+                        <td>
+                            <a class="btnSave" href="javascript:openFinishTaskTab('')">办理</a>
+                            <a class="btnShow" href="javascript:void()">查看流程图</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Modal -->
+            <div class="modal fade" id="userModal" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">用户信息</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="userForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="id" class="col-sm-2 control-label">编号</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="id" name="id" placeholder="id" readonly >
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="first" class="col-sm-2 control-label">姓</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="first" name="first" placeholder="first">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last" class="col-sm-2 control-label">名</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="last" name="last" placeholder="last">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="col-sm-2 control-label">email</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="email" name="email" placeholder="last">
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"  id="resetBtn">Close</button>
+                            <button th:type="submit" class="btn btn-primary" onclick="check()" data-toggle="modal" data-target="#myModal">确认</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+</div>
+    </div>
+</div>
+</body>
+</html>
+

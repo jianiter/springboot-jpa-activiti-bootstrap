@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:score="http://thymeleafexamples">
+<div class="row _nav">
+    <div class="col-md-11">后台管理系统</div>
+    <div class="col-md-1">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle _dropdown_btn" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span th:text='${session.User_Session_Id}'></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu _dropdown_item" aria-labelledby="dropdownMenuDivider">
+                <li><a href="javascript:jumpTo('user/reset_pwd')">修改密码</a></li>
+                <li role="separator" class="divider _dropdown_divide"></li>
+                <li><a href="javascript:jumpTo('logout')">退出登录</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</html>

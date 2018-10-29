@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:score="http://thymeleafexamples">
+<html lang="en">
+<head>
+    <title>后台首页</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrapValidator.min.css}">
+    <link rel="stylesheet" th:href="@{/css/default.css}">
+    <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script th:src="@{/js/popper.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/bootstrapValidator.min.js}"></script>
+    <script type="text/javascript" th:inline="javascript">
+        $(document).ready(function() {
+            searchList();
+            getUser();
+        });
+
+        function searchList(){
+            $("#tableList").empty();
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/task/history/list/task_id/"+$("#taskId").val();
+
+            $.getJSON(url,function(data){
+                console.log(data);
+                if(data.size>0){
+                    // 加载列表
+                    $.each(data.content, function(i, item) {
+                        var tr = $("#tableRowModel tr").eq(0).clone();
+                        $(tr).find('.time').html(item.time);
+                        $(tr).find('.userId').html(item.userId);
+                        $(tr).find('.message').html(item.message);
+                        $(tr).removeAttr("style");
+                        tr.appendTo("#tableList");
+
+                    });
+                }
+            });
+        }
+
+        function getUser(){
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/task/audit/user/task_id/"+$("#taskId").val();
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                processData:false,
+                success:function(data){
+                    if(data.code=="success"){
+                        var item = data.content;
+                        $('#id').val(item.id);
+                        $('#first').val(item.first);
+                        $('#last').val(item.last);
+                        $('#email').val(item.email);
+                    }else{
+                        alert(data.errMsg);
+                    }
+                },
+                error:function(result){
+                    alert(result.responseJSON.msg);
+                }
+            });
+        }
+
+
+
+        function  check(state) {
+            // 验证表单的规则
+            $('#userForm').bootstrapValidator({
+                live: 'enabled',
+                message: '输入的值无效',
+                submitButtons: 'button[type="submit"]',
+                submitHandler: save(state),
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    comment: {
+                        validators: {
+                            notEmpty: {
+                                message: '请输入批注'
+                            },
+                            stringLength: {
+                                min: 1,
+                                max: 100,
+                                message: '批注不能小于1位或超过100位'
+                            }
+                        }
+                    }
+                }
+                });
+        }
+
+        function save(state) {
+            var contextPath = $('#contextPath').attr('href');
+            var url =contextPath+"api/task/audit/add_user";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data:JSON.stringify({
+                    taskId: $("#taskId").val(),
+                    comment:$("#comment").val(),
+                    state:state
+                }),
+                async:false, //不是异步处理
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                processData:false,
+                success:function(data){
+                    if(data.code=="success"){
+                        alert("审核处理成功");
+                        return false;
+                    }else{
+                        alert(data.errMsg);
+                    }
+                },
+                error:function(result){
+                    alert(result.responseJSON.msg);
+                }
+            });
+            return false;
+
+        }
+
+
+
+    </script>
+</head>
+<body>
+<div class="container-fluid _body">
+
+    <div th:include="common/nav :: html"></div>
+    <div class="row _content">
+        <div class="col-md-3 _menu">
+            <div th:include="common/menu :: html"></div>
+        </div>
+        <div class="col-md-9 _main">
+            <div class="_main_title">
+                <h3>审核用户</h3>
+            </div>
+            <form id="userForm" class="form-horizontal">
+                <div class="form-group">
+                    <label for="id" class="col-sm-2 control-label">编号</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="id" name="userId" placeholder="id" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="first" class="col-sm-2 control-label">姓</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="first" name="first" placeholder="first" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="last" class="col-sm-2 control-label">名</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="last" name="last" placeholder="last" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="col-sm-2 control-label">邮箱</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="email" name="email" placeholder="email" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="comment" class="col-sm-2 control-label">批注</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="comment" name="comment" placeholder="comment">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <input th:type="hidden" id ="taskId" name="taskId" th:value="${taskId}">
+
+                        <button th:type="submit" class="btn btn-primary" onclick="check(1)">批准</button>
+                        <button th:type="submit" class="btn btn-default" onclick="check(2)">驳回</button>
+                    </div>
+                </div>
+            </form>
+
+            <h3>批注列表</h3>
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>批注时间</th>
+                    <th>批注人</th>
+                    <th>批注信息</th>
+                </tr>
+                </thead>
+                <tbody id="tableList">
+
+                </tbody>
+            </table>
+
+            <table>
+                <tbody id="tableRowModel" style="display: none">
+                <!-- 列表的行模板 -->
+                <tr >
+                    <td class="time">批注时间</td>
+                    <td class="userId">批注人</td>
+                    <td class="message">批注信息</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

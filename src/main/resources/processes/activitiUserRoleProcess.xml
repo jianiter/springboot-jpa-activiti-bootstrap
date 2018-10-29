@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.activiti.org/test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" expressionLanguage="http://www.w3.org/1999/XPath" id="m1537448320410" name="" targetNamespace="http://www.activiti.org/test" typeLanguage="http://www.w3.org/2001/XMLSchema">
+  <process id="activitiUserRoleProcess" isClosed="false" isExecutable="true" name="activitiUserRoleProcess" processType="None">
+    <startEvent id="startEvent" name="开始流程"/>
+    <endEvent id="endEvent" name="结束流程"/>
+    <userTask activiti:assignee="${userId}" activiti:exclusive="true" id="saveUserTask" name="添加用户"/>
+	
+	<sequenceFlow id="_6" sourceRef="startEvent" targetRef="saveUserTask"/>
+	<sequenceFlow id="_2" sourceRef="saveUserTask" targetRef="exclusiveGateway1"/>
+	
+    <exclusiveGateway gatewayDirection="Unspecified" id="exclusiveGateway1" name="排他网关判断"/>
+	
+    <userTask activiti:candidateGroups="jl" activiti:exclusive="true" activiti:formKey="task/audit_add_user" id="auditTask1" name="经理处理用户审核"/>
+    <sequenceFlow id="_4" name="经理" sourceRef="exclusiveGateway1" targetRef="auditTask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${msg=='经理'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="_5" sourceRef="auditTask1" targetRef="endEvent"/>
+	
+    <userTask activiti:candidateGroups="zj" activiti:exclusive="true" activiti:formKey="task/audit_add_user" id="auditTask2" name="总监处理用户审核"/>
+    <sequenceFlow id="_9" name="总监" sourceRef="exclusiveGateway1" targetRef="auditTask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${msg=='总监'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="_10" sourceRef="auditTask2" targetRef="endEvent"/>
+	
+    <userTask activiti:candidateGroups="gly" activiti:exclusive="true" activiti:formKey="task/audit_add_user" id="auditTask3" name="管理员处理用户审核"/>
+    <sequenceFlow id="_12" name="管理员" sourceRef="exclusiveGateway1" targetRef="auditTask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${msg=='管理员'}]]></conditionExpression>
+    </sequenceFlow>
+	<sequenceFlow id="_13" sourceRef="auditTask3" targetRef="endEvent"/>
+	
+	<sequenceFlow id="_7" name="无审批" sourceRef="exclusiveGateway1" targetRef="endEvent">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${msg=='无审批'}]]></conditionExpression>
+    </sequenceFlow>
+	
+
+   
+   
+   
+  </process>
+  <bpmndi:BPMNDiagram documentation="background=#FFFFFF;count=1;horizontalcount=1;orientation=0;width=842.4;height=1195.2;imageableWidth=832.4;imageableHeight=1185.2;imageableX=5.0;imageableY=5.0" id="Diagram-_1" name="New Diagram">
+    <bpmndi:BPMNPlane bpmnElement="activitiUserRoleProcess">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="Shape-startEvent">
+        <omgdc:Bounds height="32.0" width="32.0" x="55.0" y="420.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="Shape-endEvent">
+        <omgdc:Bounds height="32.0" width="32.0" x="970.0" y="425.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusiveGateway1" id="Shape-exclusiveGateway1" isMarkerVisible="false">
+        <omgdc:Bounds height="32.0" width="32.0" x="440.0" y="420.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="auditTask1" id="Shape-auditTask1">
+        <omgdc:Bounds height="55.0" width="85.0" x="600.0" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="saveUserTask" id="Shape-saveUserTask">
+        <omgdc:Bounds height="55.0" width="85.0" x="215.0" y="410.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="auditTask2" id="Shape-auditTask2">
+        <omgdc:Bounds height="55.0" width="85.0" x="610.0" y="270.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="auditTask3" id="Shape-auditTask3">
+        <omgdc:Bounds height="55.0" width="85.0" x="675.0" y="415.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="_13" id="BPMNEdge__13" sourceElement="auditTask3" targetElement="endEvent">
+        <omgdi:waypoint x="760.0" y="442.5"/>
+        <omgdi:waypoint x="970.0" y="441.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_12" id="BPMNEdge__12" sourceElement="exclusiveGateway1" targetElement="auditTask3">
+        <omgdi:waypoint x="472.0" y="436.0"/>
+        <omgdi:waypoint x="675.0" y="442.5"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_2" id="BPMNEdge__2" sourceElement="saveUserTask" targetElement="exclusiveGateway1">
+        <omgdi:waypoint x="300.0" y="437.5"/>
+        <omgdi:waypoint x="440.0" y="436.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_4" id="BPMNEdge__4" sourceElement="exclusiveGateway1" targetElement="auditTask1">
+        <omgdi:waypoint x="472.0" y="436.0"/>
+        <omgdi:waypoint x="600.0" y="587.5"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_5" id="BPMNEdge__5" sourceElement="auditTask1" targetElement="endEvent">
+        <omgdi:waypoint x="685.0" y="587.5"/>
+        <omgdi:waypoint x="970.0" y="441.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_6" id="BPMNEdge__6" sourceElement="startEvent" targetElement="saveUserTask">
+        <omgdi:waypoint x="87.0" y="436.0"/>
+        <omgdi:waypoint x="215.0" y="437.5"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_7" id="BPMNEdge__7" sourceElement="exclusiveGateway1" targetElement="endEvent">
+        <omgdi:waypoint x="456.0" y="420.0"/>
+        <omgdi:waypoint x="725.0" y="230.0"/>
+        <omgdi:waypoint x="986.0" y="425.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_9" id="BPMNEdge__9" sourceElement="exclusiveGateway1" targetElement="auditTask2">
+        <omgdi:waypoint x="472.0" y="436.0"/>
+        <omgdi:waypoint x="610.0" y="297.5"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="_10" id="BPMNEdge__10" sourceElement="auditTask2" targetElement="endEvent">
+        <omgdi:waypoint x="695.0" y="297.5"/>
+        <omgdi:waypoint x="970.0" y="441.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
